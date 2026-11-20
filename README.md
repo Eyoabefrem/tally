@@ -1,88 +1,301 @@
-# Tally: a training app (Phase 3 of 3, final)
+# Tally — Log the Work
 
-| Phase | What you get |
+[![React](https://img.shields.io/badge/React-18.3.1-blue.svg?logo=react&logoColor=white)](https://react.dev/)
+[![Vite](https://img.shields.io/badge/Vite-5.4-646CFF.svg?logo=vite&logoColor=white)](https://vitejs.dev/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-v4-38B2AC.svg?logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
+[![Supabase](https://img.shields.io/badge/Supabase-Database%20%26%20Auth-3ECF8E.svg?logo=supabase&logoColor=white)](https://supabase.com/)
+[![PWA Ready](https://img.shields.io/badge/PWA-Installable%20%26%20Offline-orange.svg)](https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps)
+[![Tests](https://img.shields.io/badge/Tests-Passing-brightgreen.svg)]()
+
+> **The training log that keeps up with you.**  
+> A fast, brutalist, distraction-free strength and fitness training app. Built with a local-first philosophy, procedural animated exercise doodles, built-in workout programs, smart rest timers, automated PR detection, and optional cloud sync.
+
+---
+
+## Table of Contents
+
+- [Overview](#overview)
+- [Key Features](#key-features)
+- [Tech Stack](#tech-stack)
+- [Application Architecture](#application-architecture)
+- [Getting Started](#getting-started)
+  - [Prerequisites](#prerequisites)
+  - [Installation](#installation)
+  - [Environment Variables](#environment-variables)
+  - [Supabase Setup (Optional)](#supabase-setup-optional)
+  - [Running the App](#running-the-app)
+  - [Running Tests](#running-tests)
+- [Custom Exercise Videos](#custom-exercise-videos)
+- [Project Structure](#project-structure)
+- [Data Storage & Sync Strategy](#data-storage--sync-strategy)
+- [Deployment](#deployment)
+- [License](#license)
+
+---
+
+## Overview
+
+Most workout apps get in your way with bloated menus, intrusive subscriptions, tiny touch targets, and mandatory account gates. **Tally** is designed from the gym floor up:
+
+- **Zero-Friction Start:** Works immediately out of the box in your browser with `localStorage`—no registration required.
+- **Focus Mode:** Displays exactly what matters when lifting—large tactile steppers, wake lock to keep your screen awake, and a circular rest countdown timer with audio feedback.
+- **Procedural Motion & Video Support:** Every exercise features a lightweight SVG stick-figure animation generated in code. Drop an `.mp4` into the public folder, and Tally seamlessly switches to high-definition video.
+- **Data Ownership:** Seamlessly export all your set data to standard CSV at any time, or switch between kilograms and pounds with zero loss in fidelity.
+
+---
+
+## Key Features
+
+### 🏋️ In-Workout Focus Mode
+- **One Set at a Time:** Clean, high-contrast interface designed for quick logging between sets.
+- **Tactile Steppers:** Rapidly adjust weight and reps with large, thumb-friendly tap targets—no fiddling with small mobile keyboards.
+- **Rest Timer & Audio Cue:** Built-in animated circular countdown with quick `+15s` / `-15s` adjustments, upcoming set preview, and audio chimes on completion.
+- **Screen Wake Lock:** Integrates the browser Wake Lock API to prevent your phone screen from timing out during workout sessions.
+- **Plate Calculator:** Instant barbell plate breakdown for 20 kg and 45 lb Olympic bars.
+
+### 📋 Ready-Made Programs & Custom Routines
+Tally ships with 5 battle-tested training programs ready to log on day one:
+1. **Full Body Starter** (Beginner, 3 days/week, alternating A/B workouts)
+2. **Push, Pull, Legs (PPL)** (Intermediate, 3–6 days/week)
+3. **Upper / Lower** (Intermediate, 4 days/week)
+4. **Five by Five (5x5) Strength** (Beginner, 3 days/week)
+5. **No Equipment / Bodyweight Circuit** (Any level, anywhere)
+
+*Also supports building, customizing, and saving your own personalized workout templates.*
+
+### 📈 Smart Insights & PR Tracking
+- **Automatic Personal Records:** Detects new PRs on every completed workout using the Epley formula:
+  $$\text{1RM} = \text{weight} \times \left(1 + \frac{\text{reps}}{30}\right)$$
+  Tracks both **Heaviest Set** and **Estimated 1-Rep Max**.
+- **12-Week Volume Analytics:** Interactive weekly training volume bar charts built with Recharts.
+- **Muscle Split Distribution:** Real-time breakdown of completed sets across target muscle groups (Chest, Back, Legs, Shoulders, Arms, Glutes, Core).
+- **PR Milestones & Streaks:** Timeline of all-time broken records alongside streak tracking toward your weekly workout goals.
+- **Bodyweight Tracking:** Log daily bodyweight and view your progression over time.
+
+### 💾 Local-First & Cloud Sync
+- **Local-First Architecture:** Instant read/write operations backed by browser storage. The app is fully functional offline without an internet connection.
+- **Passwordless Supabase Sync:** Optional one-time passcode (OTP) email login. When signed in, local and remote datasets merge seamlessly with bidirectional sync.
+- **Row-Level Security (RLS):** Supabase database policies guarantee users can only read and write their own data.
+
+### 📱 Progressive Web App (PWA)
+- Fully installable on iOS, Android, and desktop devices via Web App Manifest.
+- Includes a dedicated Service Worker caching core assets for full offline reliability.
+
+---
+
+## Tech Stack
+
+| Layer | Technologies |
 |---|---|
-| 1. The app (done) | Today dashboard, programs, focus mode, records, history, progress, exercise library, settings |
-| 2. Accounts and cloud (done) | Email login, cloud sync, your own routines, bodyweight tracking |
-| **3. Insights and launch (this zip)** | **New landing page, animated doodles and video slots everywhere, units, Insights, CSV export, installable app, deployment** |
+| **Frontend Framework** | [React 18](https://react.dev/) + [Vite 5](https://vitejs.dev/) |
+| **Routing** | [React Router 6](https://reactrouter.com/) |
+| **Styling & Design** | [Tailwind CSS v4](https://tailwindcss.com/) with custom neo-brutalist design tokens |
+| **Animation** | [Framer Motion](https://www.framer.com/motion/) & procedural SVG vector animations |
+| **Charts & Data Viz** | [Recharts](https://recharts.org/) |
+| **Icons** | [Lucide React](https://lucide.dev/) |
+| **Backend & Auth** | [Supabase](https://supabase.com/) (PostgreSQL, Row-Level Security, Auth OTP) |
+| **Offline & PWA** | Web App Manifest, Service Worker Cache API, Wake Lock API |
+| **Testing** | Node.js native test runner (pure mathematical & synchronization logic) |
 
-No new Supabase tables are needed in Phase 3. If Phase 2 works for you, you are set.
+---
 
-## What changed since Phase 2
+## Application Architecture
 
-- **New landing page.** A split hero with a looping doodle athlete in a cobalt block, floating stickers (a live rest ring, a "New record" tag, a dumbbell), a scrolling marquee, a mock focus-mode card with an animated rest ring, a horizontal strip of the five programs with their own animated sketches, and tally marks that draw themselves as you scroll. Motion is turned down automatically for people who prefer reduced motion.
-- **Doodles everywhere.** Each exercise has an animated hand-drawn sketch that performs the movement (squat, hinge, push-up, press, row, curl, plank). They appear in focus mode, Programs, Today, Exercises, and the empty screens.
-- **Videos.** Real video clips play in place of the sketch when you add them (see below). Every exercise also has a **Watch technique** link that opens a video search for it.
-- **Units:** kilograms or pounds in Settings. Everything is stored in kilograms, so you can switch whenever you are not mid-workout, and nothing is lost. The plate calculator uses a 45 lb bar in pounds.
-- **Insights** (/insights): weekly volume for 12 weeks, where your sets go by muscle group, and a record timeline.
-- **CSV export** in Settings: one row per set, ready for a spreadsheet.
-- **Installable app:** an app icon, a manifest and an offline cache, so Tally can be added to a phone's home screen and opens without a connection.
+```
+tally/
+├── public/
+│   ├── favicon.svg             # Application brand icon
+│   ├── icon-192.png, 512.png   # PWA application icons
+│   ├── manifest.webmanifest    # Web App Manifest for mobile installation
+│   ├── sw.js                   # Service Worker (offline asset caching)
+│   └── videos/                 # Directory for optional looping MP4 exercise clips
+├── src/
+│   ├── components/             # Reusable UI components
+│   │   ├── Doodle.jsx          # Procedural stick-figure SVG animator & video handler
+│   │   ├── Header.jsx          # Top navigation bar
+│   │   ├── Logo.jsx            # App identity & typography
+│   │   ├── RestTimer.jsx       # Floating rest countdown component
+│   │   └── ThemeToggle.jsx     # Dark / light mode toggle
+│   ├── lib/                    # Core business logic, state, and test suites
+│   │   ├── auth.jsx            # Supabase OTP passwordless auth context
+│   │   ├── cloud.js            # Supabase API abstraction layer
+│   │   ├── csv.js              # CSV export formatter (one row per completed set)
+│   │   ├── exercises.js        # Exercise library, muscle groups, equipment, and cues
+│   │   ├── merge.js            # Conflict-free ID-based cloud/local state reconciler
+│   │   ├── programs.js         # Built-in workout templates and metadata
+│   │   ├── stats.js            # Training math: Epley 1RM, volume, PR detection, streaks
+│   │   ├── store.jsx           # Local-first reactive state provider & sync manager
+│   │   ├── supabase.js         # Supabase client initialization
+│   │   ├── units.js            # Unit conversion (kg <-> lb) and plate math
+│   │   └── *.test.js           # Unit test suites (stats, merge, units, CSV)
+│   ├── pages/                  # Route view components
+│   │   ├── Landing.jsx         # Marketing & hero showcase page
+│   │   ├── Today.jsx           # Active dashboard & workout initiator
+│   │   ├── Session.jsx         # Focused in-workout logging interface
+│   │   ├── Programs.jsx        # Program catalog and routine builder
+│   │   ├── History.jsx         # Logged workout diary & details
+│   │   ├── Progress.jsx        # Exercise-specific progression charts
+│   │   ├── Insights.jsx        # High-level volume, muscle split, and PR timeline
+│   │   ├── Body.jsx            # Bodyweight tracker & historical log
+│   │   ├── Exercises.jsx       # Exercise library with form cues & animated doodles
+│   │   ├── Settings.jsx        # Units, sound, weekly goal, and CSV export
+│   │   ├── Login.jsx           # Passwordless email authentication screen
+│   │   └── NotFound.jsx        # 404 fallback page
+│   ├── index.css               # Design system variables, tokens, and marquee animations
+│   └── main.jsx                # App entrypoint, routing, and Service Worker registration
+├── supabase/
+│   └── schema.sql              # PostgreSQL DDL with Row-Level Security policies
+├── .env.example                # Example environment variables template
+├── vercel.json                 # SPA routing rewrites and service worker header rules
+└── package.json                # Project dependencies and script declarations
+```
 
-## Run it
+---
 
-    npm install
-    npm test
-    npm run dev
+## Getting Started
 
-`npm test` runs four suites: training math, sync merge, units and CSV. All should pass. Your Phase 2 `.env` still works.
+### Prerequisites
 
-## Add your own videos
+Ensure you have **Node.js 18.0.0+** and **npm** installed on your system.
 
-Put short looping clips in `public/videos/`. The file name decides where it plays:
+### Installation
 
-- `hero.mp4`: the landing page hero.
-- `back-squat.mp4`, `bench-press.mp4` and so on: that exercise's card in Exercises. `public/videos/README.txt` lists every name.
+Clone the repository and install dependencies:
 
-Use .mp4, ideally under 3 MB, with no sound needed (they play muted and loop). If a file is missing, the animated sketch shows instead, so you can add clips one at a time. Do not upload videos you do not own the rights to.
+```bash
+git clone https://github.com/your-username/tally.git
+cd tally
+npm install
+```
 
-## Try these
+### Environment Variables
 
-1. Open the landing page: watch the hero load, then scroll through every section. Hover the mock card and the program cards.
-2. Settings > Units > Pounds. Start a workout: the steppers move by 5, the label says lb, and the plate calculator shows a 45 lb bar. Finish it, switch back to kilograms: the same lifts show in kg.
-3. Do the same workout on three different days (or use a few workouts) and open Insights.
-4. Exercises: see the sketches. Add a clip named after an exercise to `public/videos/` and reload: it plays instead.
-5. Settings > Export CSV, and open it in a spreadsheet.
-6. After deploying (below), open the site on your phone and use "Add to Home Screen". Turn on airplane mode and open it: it still loads.
+Tally works completely offline out of the box without any backend credentials. To enable optional cloud synchronization across devices, connect a Supabase project:
 
-## Deploy (free)
+1. Copy the example environment file:
+   ```bash
+   cp .env.example .env
+   ```
+2. Populate `.env` with your Supabase credentials:
+   ```env
+   VITE_SUPABASE_URL=https://your-project.supabase.co
+   VITE_SUPABASE_ANON_KEY=your-anon-public-key
+   ```
+   *(Retrieve these from your Supabase Dashboard under **Project Settings > API**).*
 
-1. Put the project on GitHub: `git init`, `git add .`, `git commit -m "Tally"`, then create an empty repository on github.com and run the two lines it shows you. The `.gitignore` keeps `.env` out of GitHub. Check that no `.env` appears on the repository page.
-2. vercel.com > **Add New > Project** > import the repository. Leave the framework as Vite.
-3. Add two **Environment Variables**: `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`. Deploy.
-4. Supabase > **Authentication > URL Configuration**: set the **Site URL** to your Vercel address.
-5. Open your address and repeat the Phase 2 login check.
+### Supabase Setup (Optional)
 
-`vercel.json` makes direct links like /today work on refresh, and keeps the service worker fresh.
+If using cloud sync, initialize your database schema in Supabase:
 
-## Architecture (final)
+1. Navigate to your Supabase project's **SQL Editor**.
+2. Open `supabase/schema.sql` from this repository, copy its contents, and run the query.
+3. This creates four tables with Row-Level Security (RLS) enabled:
+   - `workouts`: Logged workouts and completed set data.
+   - `user_settings`: User preferences (units, weekly target, timer defaults).
+   - `routines`: Custom-created workout templates.
+   - `bodyweight`: Date-stamped bodyweight measurements.
+4. In **Authentication > URL Configuration**, add your local/production URL to the **Redirect URLs**.
 
-    tally/
-    ├── index.html, vite.config.js, vercel.json, package.json, .env.example, .gitignore
-    ├── supabase/schema.sql         unchanged since Phase 2
-    ├── public/                     favicon, app icons, manifest.webmanifest, sw.js (offline), videos/
-    └── src/
-        ├── main.jsx                routes, providers, service worker registration
-        ├── index.css               design tokens, buttons, marquee
-        ├── lib/
-        │   ├── stats.js            training math: records, series, streaks, calendar, plates, weekly volume, muscle split
-        │   ├── units.js            kg and lb conversion (stored in kg, converted at the screen edges)
-        │   ├── csv.js              spreadsheet export
-        │   ├── merge.js            cloud and local merge
-        │   ├── programs.js, exercises.js    pure data
-        │   ├── supabase.js, auth.jsx, cloud.js, store.jsx    login, sync and app state
-        │   └── *.test.js           tests (npm test)
-        ├── components/             Logo, Header, ThemeToggle, RestTimer, Doodle (sketches, video slots, stickers)
-        └── pages/                  Landing, Today, Programs, Session, Log, History, Progress, Insights, Body, Exercises, Settings, Login, NotFound
+### Running the App
 
-### Decisions worth knowing
+Start the local Vite development server:
 
-- **Doodles are drawn in code.** Each is two poses of a stick figure; the browser animates between them, and a hand-drawn wobble filter roughens the lines. Adding a movement means adding a pair of poses in `Doodle.jsx`.
-- **Video is optional by design.** The page tries your file first and falls back to the sketch, so there is nothing to configure.
-- **Units never change stored data.** Weights are saved in kilograms. Switching units only changes how they are shown and typed.
-- **The offline cache touches only this site's own files.** Supabase calls, fonts and videos always go straight to the network.
+```bash
+npm run dev
+```
 
-## Before you share it widely
+Open [http://localhost:5173](http://localhost:5173) in your browser.
 
-- **Supabase email limits:** the built-in sender allows only a few login codes per hour. Add your own provider (Authentication > SMTP) before real traffic.
-- **Form cues and sketches are reminders, not coaching.** Add real clips where you can.
-- **Progress photos, social features and wearables** are not built. They are good next steps.
+### Running Tests
+
+Tally uses lightweight, zero-dependency Node.js test suites to rigorously verify mathematical calculations, unit conversions, CSV formatting, and synchronization merge logic:
+
+```bash
+npm test
+```
+
+This runs:
+- `src/lib/stats.test.js`: Epley formula calculations, volume math, PR detection, and streaks.
+- `src/lib/merge.test.js`: Local-first ID reconciliation and conflict resolution.
+- `src/lib/units.test.js`: Precise kg/lb transformations and barbell plate breakdowns.
+- `src/lib/csv.test.js`: RFC-compliant CSV generation.
+
+---
+
+## Custom Exercise Videos
+
+Tally features a hybrid media engine:
+- By default, exercises display an animated, hand-drawn vector sketch drawn directly in SVG.
+- If you supply your own short `.mp4` video clips in `public/videos/`, Tally will seamlessly render the video in place of the doodle.
+
+### Supported Video Names
+
+Drop your looping clips directly into `public/videos/`:
+
+| Exercise Video File | Matching Exercise |
+|---|---|
+| `hero.mp4` | Landing page hero card |
+| `back-squat.mp4` | Back Squat |
+| `front-squat.mp4` | Front Squat |
+| `deadlift.mp4` | Deadlift |
+| `romanian-deadlift.mp4` | Romanian Deadlift |
+| `bench-press.mp4` | Bench Press |
+| `incline-bench-press.mp4` | Incline Bench Press |
+| `overhead-press.mp4` | Overhead Press |
+| `barbell-row.mp4` | Barbell Row |
+| `pull-up.mp4` / `chin-up.mp4` | Pull-up / Chin-up |
+| `lat-pulldown.mp4` | Lat Pulldown |
+| `dumbbell-curl.mp4` | Dumbbell Curl |
+| `triceps-pushdown.mp4` | Triceps Pushdown |
+| `leg-press.mp4` | Leg Press |
+| `lunge.mp4` | Lunge |
+| `hip-thrust.mp4` | Hip Thrust |
+| `dip.mp4` | Dip |
+| `push-up.mp4` / `pike-push-up.mp4` | Push-up / Pike Push-up |
+| `plank.mp4` | Plank |
+| `glute-bridge.mp4` | Glute Bridge |
+| `calf-raise.mp4` | Calf Raise |
+
+> **Format Recommendation:** H.264 `.mp4`, under 3 MB, square or 16:9 aspect ratio. Audio is automatically muted and ignored.
+
+---
+
+## Data Storage & Sync Strategy
+
+Tally enforces clear data architecture guidelines:
+
+1. **Normalized Internal Units:** All weights are saved to disk and database in **kilograms (kg)**. When a user switches their display preference to pounds (**lb**), the values are converted at the UI boundary. This prevents rounding drift and ensures data integrity regardless of how many times units are toggled.
+2. **Deterministic Merging:** When logging into an account with existing local browser data, Tally reconciles local and cloud records by unique ID (`mergeById`), preserving the superset of workouts and pushing non-replicated local items to the cloud.
+3. **PWA Scope & Cache Boundary:** The service worker exclusively caches application shell assets (`HTML`, `JS`, `CSS`, static assets). Supabase API calls and dynamic video assets always bypass the service worker to keep data fresh and bandwidth low.
+
+---
+
+## Deployment
+
+### Vercel (Recommended)
+
+Tally includes a ready-to-use `vercel.json` configured for Single Page Application (SPA) URL rewrites and proper `sw.js` cache-control headers:
+
+1. Push your repository to GitHub / GitLab / Bitbucket.
+2. Import the project in [Vercel](https://vercel.com/).
+3. Set Framework Preset to **Vite**.
+4. Under **Environment Variables**, add:
+   - `VITE_SUPABASE_URL`
+   - `VITE_SUPABASE_ANON_KEY`
+5. Click **Deploy**.
+
+### Other Static Hosts (Netlify, Cloudflare Pages)
+
+Tally can be hosted on any static host. Ensure you build the production bundle:
+
+```bash
+npm run build
+```
+
+The output will be generated in `dist/`. Ensure your host is configured to rewrite all routes to `/index.html`.
+
+---
+
+## License
+
+This project is licensed under the [MIT License](LICENSE) — see the codebase for details.
