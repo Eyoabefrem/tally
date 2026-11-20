@@ -1,0 +1,26 @@
+// name: [muscle, equipment, cue]
+export const META = {
+  'Back Squat': ['Legs', 'Barbell', 'Brace your core, sit between your hips, drive the floor away.'],
+  'Front Squat': ['Legs', 'Barbell', 'Keep your elbows high and your chest tall.'],
+  'Deadlift': ['Back', 'Barbell', 'Bar over mid-foot, flat back, push the floor and stand tall.'],
+  'Romanian Deadlift': ['Legs', 'Barbell', 'Hinge at the hips with soft knees until you feel your hamstrings stretch.'],
+  'Bench Press': ['Chest', 'Barbell', 'Shoulder blades pinched, feet planted, lower to mid-chest.'],
+  'Incline Bench Press': ['Chest', 'Barbell', 'Press up and slightly back over your shoulders.'],
+  'Overhead Press': ['Shoulders', 'Barbell', 'Squeeze your glutes, press in a straight line, head through at the top.'],
+  'Barbell Row': ['Back', 'Barbell', 'Hinge forward, pull the bar to your lower ribs.'],
+  'Pull-up': ['Back', 'Bodyweight', 'Start from a full hang, pull your chest to the bar.'],
+  'Chin-up': ['Back', 'Bodyweight', 'Palms facing you, lead with your chest.'],
+  'Lat Pulldown': ['Back', 'Machine', 'Pull the bar to your collarbone, elbows down and back.'],
+  'Dumbbell Curl': ['Arms', 'Dumbbells', 'Elbows pinned to your sides, no swinging.'],
+  'Triceps Pushdown': ['Arms', 'Cable', 'Elbows fixed, extend fully and squeeze.'],
+  'Leg Press': ['Legs', 'Machine', 'Feet shoulder width, lower until your knees reach about 90 degrees.'],
+  'Lunge': ['Legs', 'Dumbbells', 'Long step, drop straight down, push through the front heel.'],
+  'Hip Thrust': ['Glutes', 'Barbell', 'Chin tucked, drive through your heels, lock out at the top.'],
+  'Dip': ['Chest', 'Bodyweight', 'Lean slightly forward and lower until your shoulders are below your elbows.'],
+  'Push-up': ['Chest', 'Bodyweight', 'Body in one straight line, chest to the floor.'],
+  'Pike Push-up': ['Shoulders', 'Bodyweight', 'Hips high, lower your head between your hands.'],
+  'Plank': ['Core', 'Bodyweight', 'Ribs down, glutes tight, breathe steadily.'],
+  'Glute Bridge': ['Glutes', 'Bodyweight', 'Drive through your heels and pause at the top.'],
+  'Calf Raise': ['Legs', 'Machine', 'Full stretch at the bottom, pause at the top.'],
+}
+export const PRESETS = Object.keys(META)
